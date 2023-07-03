@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+
+FORCE=0
+
+show_help () {
+    if [ "$1" != "" ]; then
+        echo ""
+        echo "$1"
+    fi
+
+    echo ""
+    echo "Usage: $(basename $0) [options]"
+    echo ""
+    echo "Options"
+    echo "  -f|--force      Download source even if the source folder is not empty"
+    echo "  -h|--help       Show this help"
+    echo ""
+}
+
+for arg in "$@"; do
+    case $arg in
+        -h|--help)
+            show_help
+            exit 0
+        ;;
+        -f|--force)
+            FORCE=1
+        ;;
+        *)
+            show_help "Unknown argument '$arg'"
+            exit 1
+        ;;
+    esac
+done
+
+if [ ! -d $SOURCE_FOLDER ]; then
+    mkdir -p $SOURCE_FOLDER
+elif [ "$(ls -A $SOURCE_FOLDER)" ] && [ $FORCE == 0 ]; then
+    echo "The source folder is not empty. See help."
+    exit 1
+fi
+
+## Download source
+wget https://github.com/RMerl/asuswrt-merlin/tarball/master -O - | tar xz --strip-components=1 -C $SOURCE_FOLDER
+
+# fixes almost all git errors (even though they may not have a meaning)
+git init $SOURCE_FOLDER
+
+# fix broken configure script for Libxml2
+sed -i s/AM_C_PROTOTYPES/#AM_C_PROTOTYPES/g $SOURCE_FOLDER/release/src/router/libxml2/configure.in
+cd $SOURCE_FOLDER/release/src/router/libxml2
+aclocal
+
+# fix missing macros for SquashFS
+sed '/^#include <sys\/stat.h>/a #include <sys\/sysmacros.h>' -i $SOURCE_FOLDER/release/src-rt/linux/linux-2.6/scripts/squashfs/mksquashfs.c
+sed '/^#include <sys\/stat.h>/a #include <sys\/sysmacros.h>' -i $SOURCE_FOLDER/release/src-rt/linux/linux-2.6/scripts/squashfs/unsquashfs.c

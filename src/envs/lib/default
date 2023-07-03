@@ -1,0 +1,28 @@
+#!/bin/bash
+setup_environment () {
+    ln -s $SOURCE_FOLDER/tools/brcm /opt/brcm
+    ln -s $SOURCE_FOLDER/release/src-rt-6.x.4708/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3 /opt/brcm-arm
+    export PATH=$PATH:/opt/brcm/hndtools-mipsel-linux/bin:/opt/brcm/hndtools-mipsel-uclibc/bin:/opt/brcm-arm/bin
+
+    mkdir -p /media/ASUSWRT/
+    ln -s $SOURCE_FOLDER /media/ASUSWRT/asuswrt-merlin
+}
+
+set_work_dir () {
+    if [ -z "$1" ]; then
+        echo "No workdir specified"
+    else
+        cd $SOURCE_FOLDER/release/$1
+        echo "Workdir: '$SOURCE_FOLDER/release/$1'"
+    fi
+}
+
+msg () {
+    echo "Use the following commands to build the firmware"
+    echo " 'make clean && make $(basename ${BASH_SOURCE[1]})'"
+}
+
+warning () {
+    model=$(basename ${BASH_SOURCE[1]})
+    echo "Warning: This image has not been tested with ${model^^}!"
+}

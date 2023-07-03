@@ -1,0 +1,6 @@
+#!/bin/bash
+source /opt/envs/lib/default
+setup_environment
+set_work_dir src-rt
+msg
+warning
