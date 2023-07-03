@@ -29,7 +29,7 @@ From the docker image, set the environment variables by:
 source /opt/envs/[rt-n16, rt-n66u, rt-ac66u, rt-ac56u]
 ```
 
-Once you have set the environment, you will be in the working library. From here you can build the firmware with:
+Once you have set the environment, you will be in the working directory. From here you can build the firmware with:
 ```bash
 make clean && make [rt-n16, rt-n66u, rt-ac66u, rt-ac56u]
 ```
